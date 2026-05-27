@@ -6,7 +6,7 @@ A read-only REST API for monitoring ZFS — pools, datasets, snapshots, and back
 
 - Pool health, capacity, and fragmentation
 - Dataset space usage and properties
-- Snapshot listings and (optional) policy-aware compliance reports
+- Snapshot listings
 - Backup log inspection
 - A `/metrics` endpoint scrapeable by Prometheus or VictoriaMetrics
 - Interactive Swagger UI at `/api/docs`
@@ -35,18 +35,6 @@ services:
 
 That's it. `docker compose up -d` and you're done. The API is now at `http://localhost:8000`.
 
-### Optional: snapshot compliance reports
-
-The `/api/v1/snapshots` endpoint produces a policy-aware compliance report by reading a JSON cache file generated externally by a `zfs-snapshot-report` tool. If you have such a tool running on the host, mount its output file into the container:
-
-```yaml
-    volumes:
-      - /dev/zfs:/dev/zfs:ro
-      - /var/cache/zfs-policy/snapshot-report.json:/var/cache/zfs-policy/snapshot-report.json:ro
-```
-
-(The path may differ depending on your setup.)
-
 ## Example queries
 
 ```bash
@@ -58,9 +46,6 @@ curl -s http://localhost:8000/api/v1/pools/tank | jq
 
 # All datasets
 curl -s http://localhost:8000/api/v1/datasets | jq
-
-# Snapshot compliance report (requires zfs-policy mount above)
-curl -s http://localhost:8000/api/v1/snapshots | jq
 
 # Prometheus metrics
 curl -s http://localhost:8000/metrics
@@ -80,7 +65,7 @@ scrape_configs:
       - targets: ['zfs-host-1:8000', 'zfs-host-2:8000']
 ```
 
-Exposed metrics include `zfs_pool_health`, `zfs_pool_capacity_percent`, `zfs_pool_fragmentation_percent`, `zfs_dataset_used_bytes`, `zfs_snapshot_count`, and (with the snapshot report cache mounted) `zfs_snapshot_compliance_percent`.
+Exposed metrics include `zfs_pool_health`, `zfs_pool_capacity_percent`, `zfs_pool_fragmentation_percent`, `zfs_dataset_used_bytes`, and `zfs_snapshot_count`.
 
 ## Home Assistant
 
