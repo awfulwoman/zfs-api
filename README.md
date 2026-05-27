@@ -37,7 +37,7 @@ That's it. `docker compose up -d` and you're done. The API is now at `http://loc
 
 ### Optional: snapshot compliance reports
 
-If you use [zfs-policy](https://github.com/bashclub/zfs-policy)-style snapshot policies and want compliance reporting at `/api/v1/snapshots`, also mount the cache file produced by `zfs-snapshot-report`:
+The `/api/v1/snapshots` endpoint produces a policy-aware compliance report by reading a JSON cache file generated externally by a `zfs-snapshot-report` tool. If you have such a tool running on the host, mount its output file into the container:
 
 ```yaml
     volumes:
@@ -45,7 +45,7 @@ If you use [zfs-policy](https://github.com/bashclub/zfs-policy)-style snapshot p
       - /var/cache/zfs-policy/snapshot-report.json:/var/cache/zfs-policy/snapshot-report.json:ro
 ```
 
-(The path may differ depending on your zfs-policy setup.)
+(The path may differ depending on your setup.)
 
 ## Example queries
 
@@ -80,7 +80,7 @@ scrape_configs:
       - targets: ['zfs-host-1:8000', 'zfs-host-2:8000']
 ```
 
-Exposed metrics include `zfs_pool_health`, `zfs_pool_capacity_percent`, `zfs_pool_fragmentation_percent`, `zfs_dataset_used_bytes`, `zfs_snapshot_count`, and (with the policy cache mounted) `zfs_snapshot_compliance_percent`.
+Exposed metrics include `zfs_pool_health`, `zfs_pool_capacity_percent`, `zfs_pool_fragmentation_percent`, `zfs_dataset_used_bytes`, `zfs_snapshot_count`, and (with the snapshot report cache mounted) `zfs_snapshot_compliance_percent`.
 
 ## Home Assistant
 
